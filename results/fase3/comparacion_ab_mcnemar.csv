@@ -1,0 +1,2 @@
+A,B,A_acierta_B_falla,A_falla_B_acierta,discordancias,mcnemar_exacto_p,alpha,significativo
+Regresion_Logistica,Random_Forest,598,816,1414,7.387603731212135e-09,0.05,True
