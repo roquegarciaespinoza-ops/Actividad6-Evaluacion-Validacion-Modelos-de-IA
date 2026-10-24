@@ -22,7 +22,23 @@ jobs:
         env:
           MPLBACKEND: Agg
         run: |
-          jupyter nbconvert --to notebook --execute notebooks/actividad6_fase2.ipynb --output fase2_ejecutado.ipynb --output-dir . --ExecutePreprocessor.timeout=1500
+          jupyter nbconvert --to notebook --execute notebooks/actividad6_fase2.ipynb --output fase2_ejecutado.ipynb --output-dir . --ExecutePreprocessor.timeout=1500 --ExecutePreprocessor.allow_errors=True
+          python - <<'PY'
+          import json, sys
+          with open("fase2_ejecutado.ipynb", encoding="utf-8") as f:
+              nb = json.load(f)
+          errors = []
+          for i, cell in enumerate(nb["cells"], 1):
+              for output in cell.get("outputs", []):
+                  if output.get("output_type") == "error":
+                      errors.append((i, output))
+          if errors:
+              for i, err in errors:
+                  print(f"\n::error::ERROR EN CELDA {i}: {err.get('ename')}: {err.get('evalue')}")
+                  print("\n".join(err.get("traceback", [])))
+              sys.exit(1)
+          print("Notebook ejecutado sin errores en celdas")
+          PY
           test -s results/metricas_test.csv
           test -s results/validacion_cruzada.csv
           test -s results/curvas_roc.png
