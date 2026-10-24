@@ -1,0 +1,6 @@
+costo_FP,costo_FN,modelo,umbral,costo_total
+100,5000,Random_Forest,0.1,3672200
+300,5000,Random_Forest,0.1,6156600
+600,5000,Random_Forest,0.1,9883200
+1000,5000,Random_Forest,0.2,13555000
+2000,5000,Random_Forest,0.3,17221000
