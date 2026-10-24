@@ -39,6 +39,9 @@ jobs:
               sys.exit(1)
           print("Notebook ejecutado sin errores en celdas")
           PY
+          echo "Directorio de ejecución: $(pwd)"
+          echo "Archivos generados:"
+          find . -maxdepth 3 -type f \( -name '*.csv' -o -name '*.png' \) -print
           test -s results/metricas_test.csv
           test -s results/validacion_cruzada.csv
           test -s results/curvas_roc.png
