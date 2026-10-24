@@ -1,0 +1,37 @@
+name: Validar notebook Fase 2
+on:
+  push:
+    paths:
+      - 'notebooks/actividad6_fase2.ipynb'
+      - '.github/workflows/validar-fase2.yml'
+  workflow_dispatch:
+jobs:
+  ejecutar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Instalar dependencias
+        run: |
+          python -m pip install --upgrade pip
+          pip install ucimlrepo pandas numpy scikit-learn matplotlib seaborn jupyter nbconvert ipykernel
+      - name: Ejecutar notebook
+        env:
+          MPLBACKEND: Agg
+        run: |
+          jupyter nbconvert --to notebook --execute notebooks/actividad6_fase2.ipynb --output fase2_ejecutado.ipynb --output-dir . --ExecutePreprocessor.timeout=1500
+          test -s results/metricas_test.csv
+          test -s results/validacion_cruzada.csv
+          test -s results/curvas_roc.png
+      - name: Guardar evidencias
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fase2-evidencias
+          path: |
+            fase2_ejecutado.ipynb
+            results/
+          if-no-files-found: warn
