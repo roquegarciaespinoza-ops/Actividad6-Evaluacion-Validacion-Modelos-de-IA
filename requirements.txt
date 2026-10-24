@@ -1,0 +1,10 @@
+# Dependencias previstas; se fijarán versiones tras verificar la ejecución.
+numpy
+pandas
+scikit-learn
+scipy
+statsmodels
+matplotlib
+seaborn
+jupyter
+ucimlrepo
