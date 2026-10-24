@@ -1,0 +1,49 @@
+name: Validar notebook Fase 3
+on:
+  push:
+    paths:
+      - 'notebooks/actividad6_fase3.ipynb'
+      - '.github/workflows/validar-fase3.yml'
+  workflow_dispatch:
+jobs:
+  ejecutar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Instalar dependencias
+        run: |
+          python -m pip install --upgrade pip
+          pip install ucimlrepo pandas numpy scikit-learn scipy matplotlib jupyter nbconvert ipykernel
+      - name: Ejecutar y diagnosticar notebook
+        env:
+          MPLBACKEND: Agg
+        run: |
+          jupyter nbconvert --to notebook --execute notebooks/actividad6_fase3.ipynb --output fase3_ejecutado.ipynb --output-dir . --ExecutePreprocessor.timeout=2100 --ExecutePreprocessor.allow_errors=True
+          python - <<'PY'
+          import json,sys
+          with open("fase3_ejecutado.ipynb",encoding="utf-8") as f: nb=json.load(f)
+          errors=[(i,o) for i,c in enumerate(nb["cells"],1) for o in c.get("outputs",[]) if o.get("output_type")=="error"]
+          for i,e in errors:
+              print(f"::error::Celda {i}: {e.get('ename')}: {e.get('evalue')}")
+              print("\n".join(e.get("traceback",[])))
+          if errors: sys.exit(1)
+          print("Fase 3: notebook ejecutado sin errores")
+          PY
+          test -s results/fase3/umbrales_desarrollo.csv
+          test -s results/fase3/comparacion_ab_mcnemar.csv
+          test -s results/fase3/sensibilidad_costos.csv
+          test -s results/fase3/evaluacion_final_test.csv
+          test -s results/fase3/costos_por_umbral.png
+      - name: Guardar evidencias
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fase3-evidencias
+          path: |
+            fase3_ejecutado.ipynb
+            results/fase3/
+          if-no-files-found: warn
